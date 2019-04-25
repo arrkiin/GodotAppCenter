@@ -1,6 +1,10 @@
 package org.godotengine.godot;
 
+import android.app.Activity;
+
 import java.util.Map;
+import java.util.HashMap;
+import java.util.Iterator;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,12 +15,15 @@ import com.microsoft.appcenter.crashes.Crashes;
 
 public class GodotAppCenter extends Godot.SingletonBase
 {
+
+    private Activity activity = null; // The main activity of the game
+    
     public void start(String api_key){
-        AppCenter.start(getApplication(), "api_key", Analytics.class, Crashes.class);
+        AppCenter.start(activity.getApplication(), api_key, Analytics.class, Crashes.class);
     }
 
     public boolean isEnabled(){
-        return AppCenter.isEnabled();
+        return AppCenter.isEnabled().get();
     }
 
     public void setEnabled(boolean value){
@@ -27,8 +34,8 @@ public class GodotAppCenter extends Godot.SingletonBase
         AppCenter.setUserId(userId);
     }
 
-    public void trackEvent(String name, String jsonProperties){
-        if (properties == null){
+    public void analyticsTrackEvent(String name, String jsonProperties){
+        if (jsonProperties == null){
             Analytics.trackEvent(name);
         } else {
             try {
@@ -36,7 +43,8 @@ public class GodotAppCenter extends Godot.SingletonBase
                 JSONObject o = new JSONObject(jsonProperties);
                 Iterator<String> keys = o.keys();
                 while(keys.hasNext()){
-                    properties.put(keys.next(),o.getString(key));
+                    String key = keys.next();
+                    properties.put(key,o.getString(key));
                 }
                 Analytics.trackEvent(name,properties);
             } catch (JSONException e){
@@ -44,5 +52,25 @@ public class GodotAppCenter extends Godot.SingletonBase
             }
         }
     }
+
+    public void crashesGenerateTestCrash(){
+        Crashes.generateTestCrash();
+    }
+
+    static public Godot.SingletonBase initialize(Activity activity)
+    {
+        return new GodotAppCenter(activity);
+    }
+
+   public GodotAppCenter(Activity p_activity) {
+       registerClass("AdMob", new String[] {
+           "start",
+           "isEnabled","setEnabled",
+           "setUserId",
+           "analyticsTrackEvent",
+           "crashesGenerateTestCrash"
+       });
+       activity = p_activity;
+   }
 
 }
