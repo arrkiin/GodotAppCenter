@@ -1,6 +1,14 @@
 package org.godotengine.godot;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.content.Context;
+import android.content.ComponentName;
+import android.content.pm.PackageManager;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+
+import android.util.Log;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -18,10 +26,6 @@ public class GodotAppCenter extends Godot.SingletonBase
 
     private Activity activity = null; // The main activity of the game
     
-    public void start(String api_key){
-        AppCenter.start(activity.getApplication(), api_key, Analytics.class, Crashes.class);
-    }
-
     public boolean isEnabled(){
         return AppCenter.isEnabled().get();
     }
@@ -34,22 +38,28 @@ public class GodotAppCenter extends Godot.SingletonBase
         AppCenter.setUserId(userId);
     }
 
-    public void analyticsTrackEvent(String name, String jsonProperties){
-        if (jsonProperties == null){
-            Analytics.trackEvent(name);
-        } else {
-            try {
-                Map<String, String> properties = new HashMap<>();
-                JSONObject o = new JSONObject(jsonProperties);
-                Iterator<String> keys = o.keys();
-                while(keys.hasNext()){
-                    String key = keys.next();
-                    properties.put(key,o.getString(key));
-                }
-                Analytics.trackEvent(name,properties);
-            } catch (JSONException e){
-                e.printStackTrace();
+    public void setLogLevel(int level){
+        AppCenter.setLogLevel(level);
+    }
+
+    public void analyticsTrackSimpleEvent(String name){
+        Log.d("godot", "AppCenter.Analytics: SimpleEvent( " + name + ")");
+        Analytics.trackEvent(name);
+    }
+
+    public void analyticsTrackComplexEvent(String name, String jsonProperties){
+        Log.d("godot", "AppCenter.Analytics: ComplexEvent( " + name + " : " + jsonProperties + ")");
+        try {
+            Map<String, String> properties = new HashMap<>();
+            JSONObject o = new JSONObject(jsonProperties);
+            Iterator<String> keys = o.keys();
+            while(keys.hasNext()){
+                String key = keys.next();
+                properties.put(key,o.getString(key));
             }
+            Analytics.trackEvent(name,properties);
+        } catch (JSONException e){
+            e.printStackTrace();
         }
     }
 
@@ -57,17 +67,36 @@ public class GodotAppCenter extends Godot.SingletonBase
         Crashes.generateTestCrash();
     }
 
+    public static void triggerRebirth(Context context) {
+        Log.d("godot","Triggered rebirth");
+        PackageManager packageManager = context.getPackageManager();
+        Intent intent = packageManager.getLaunchIntentForPackage(context.getPackageName());
+        ComponentName componentName = intent.getComponent();
+        Intent mainIntent = Intent.makeRestartActivityTask(componentName);
+        context.startActivity(mainIntent);
+        System.exit(0);
+    }
+
     static public Godot.SingletonBase initialize(Activity activity)
     {
+        SharedPreferences prefs = activity.getSharedPreferences("godot_app_center", Context.MODE_PRIVATE);
+        if (prefs.getString("api_key",null) == null){
+            String api_key = GodotLib.getGlobal("app_center/api_key");
+            Log.d("godot","Initialized api_key from godot: " + api_key);
+            Editor editor = prefs.edit();
+            editor.putString("api_key", api_key);
+            editor.commit();
+            triggerRebirth(activity);
+        }
         return new GodotAppCenter(activity);
     }
 
    public GodotAppCenter(Activity p_activity) {
-       registerClass("AdMob", new String[] {
-           "start",
+       registerClass("AppCenter", new String[] {
            "isEnabled","setEnabled",
            "setUserId",
-           "analyticsTrackEvent",
+           "setLogLevel",
+           "analyticsTrackSimpleEvent","analyticsTrackComplexEvent",
            "crashesGenerateTestCrash"
        });
        activity = p_activity;
