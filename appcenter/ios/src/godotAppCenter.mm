@@ -23,7 +23,7 @@ void GodotAppCenter::setEnabled(boolean value){
 }
 
 void GodotAppCenter::setUserId(String userId){
-    NSString *userIdStr = [[NSString alloc] initWithUTF8String:name.utf8().get_data()]
+    NSString *userIdStr = [[[NSString alloc] initWithUTF8String:name.utf8().get_data()] autorelease];
     [MSAppCenter setUserId:userIdStr];
 }
 
@@ -32,22 +32,22 @@ void GodotAppCenter::setLogLevel(int level){
 }
 
 void GodotAppCenter::analyticsTrackSimpleEvent(String name) {
-    NSString *eventName = [[NSString alloc] initWithUTF8String:name.utf8().get_data()];
+    NSString *eventName = [[[NSString alloc] initWithUTF8String:name.utf8().get_data()] autorelease];
     NSLog(@"AppCenter.Analytics: SimpleEvent( %@ )",eventName);
     [MSAnalytics trackEvent:eventName];
 }
 
 void GodotAppCenter::analyticsTrackComplexEvent(String name, String jsonProperties) {
-    NSString *eventName = [[[NSString alloc] initWithUTF8String:name.utf8().get_data()];
+    NSString *eventName = [[[NSString alloc] initWithUTF8String:name.utf8().get_data()] autorelease];
 
-    NSString *jsonString = [[NSString alloc] initWithData:data
-                                                 encoding:NSUTF8StringEncoding];
+    NSString *jsonString = [[[NSString alloc] initWithData:data
+                                                 encoding:NSUTF8StringEncoding] autorelease];
     NSLog(@"AppCenter.Analytics: ComplexEvent( %@ : %@ )",eventName,jsonString);
 
     NSError *error = nil;
-    NSDictionary *properties = [NSJSONSerialization JSONObjectWithData:data
+    NSDictionary *properties = [[NSJSONSerialization JSONObjectWithData:data
                                                          options:kNilOptions 
-                                                           error:&error];
+                                                           error:&error] autorelease];
 
     if (!properties) {
         NSLog(@"Error parsing JSON: %@", error);
