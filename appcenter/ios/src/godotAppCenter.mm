@@ -1,8 +1,8 @@
 #include "godotAppCenter.h"
 
-#import <AppCenter/AppCenter.h>
-#import <AppCenterAnalytics/AppCenterAnalytics.h>
-#import <AppCenterCrashes/AppCenterCrashes.h>
+@import AppCenter;
+@import AppCenterAnalytics;
+@import AppCenterCrashes;
 
 #define CLASS_DB ClassDB
 
