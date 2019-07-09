@@ -12,4 +12,4 @@ def configure(env):
 	if env['platform'] == "iphone":
 		env.AppendUnique(FRAMEWORKPATH='#modules/appcenter/ios/lib')
 		env.AppendUnique(FRAMEWORKS=['-framework AppCenter','-framework AppCenterAnalytics','-framework AppCenterCrashes','-framework Foundation','-framework SystemConfiguration','-framework CoreTelephony','-framework UIKit','-framework WebKit','-framework SafariServices','-framework AuthenticationServices'])
-		env.Append(LINKFLAGS=['-ObjC', '-framework', 'AppCenter','-framework', 'AppCenterAnalytics','-framework', 'AppCenterCrashes','-framework', 'Foundation','-framework', 'SystemConfiguration','-framework', 'CoreTelephony','-framework', 'UIKit','-framework', 'WebKit','-framework', 'SafariServices','-framework', 'AuthenticationServices'])
+		env.AppendUnique(LINKFLAGS=['-ObjC', '-framework', 'AppCenter','-framework', 'AppCenterAnalytics','-framework', 'AppCenterCrashes','-framework', 'Foundation','-framework', 'SystemConfiguration','-framework', 'CoreTelephony','-framework', 'UIKit','-framework', 'WebKit','-framework', 'SafariServices','-framework', 'AuthenticationServices'])
