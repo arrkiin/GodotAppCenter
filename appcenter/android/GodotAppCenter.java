@@ -63,10 +63,6 @@ public class GodotAppCenter extends Godot.SingletonBase
         }
     }
 
-    public void crashesGenerateTestCrash(){
-        Crashes.generateTestCrash();
-    }
-
     public static void triggerRebirth(Context context) {
         Log.d("godot","Triggered rebirth");
         PackageManager packageManager = context.getPackageManager();
@@ -81,7 +77,7 @@ public class GodotAppCenter extends Godot.SingletonBase
     {
         SharedPreferences prefs = activity.getSharedPreferences("godot_app_center", Context.MODE_PRIVATE);
         if (prefs.getString("api_key",null) == null){
-            String api_key = GodotLib.getGlobal("app_center/api_key");
+            String api_key = GodotLib.getGlobal("app_center/api_key_android");
             Log.d("godot","Initialized api_key from godot: " + api_key);
             Editor editor = prefs.edit();
             editor.putString("api_key", api_key);
@@ -97,7 +93,6 @@ public class GodotAppCenter extends Godot.SingletonBase
            "setUserId",
            "setLogLevel",
            "analyticsTrackSimpleEvent","analyticsTrackComplexEvent",
-           "crashesGenerateTestCrash"
        });
        activity = p_activity;
    }
